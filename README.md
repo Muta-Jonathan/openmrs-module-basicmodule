@@ -1,32 +1,79 @@
-openmrs-module-basicmodule
-==========================
+# Location-Based Patient Data Filter Module
 
-A demonstration module for new OpenMRS module developers
+This module provides **location-based filtering** for patients in OpenMRS. It ensures that users only see patients assigned to locations they have access to. This is especially useful for restricting access in multi-location setups.
 
-Description
------------
-This is a very basic module which can be used as a starting point in creating a new module.
+---
 
-Building from Source
---------------------
-You will need to have Java 1.6+ and Maven 2.x+ installed.  Use the command 'mvn package' to 
-compile and package the module.  The .omod file will be in the omod/target folder.
+## Features
 
-Alternatively you can add the snippet provided in the [Creating Modules](https://wiki.openmrs.org/x/cAEr) page to your 
-omod/pom.xml and use the mvn command:
+- Apply **Hibernate filters** to the `Patient` entity based on user locations.
+- Supports fetching **user-accessible locations** from:
+    - User properties
+    - User privileges
+- Automatically includes **child locations** for users.
+- Exempts **super users** from filters.
+- Can be extended for additional entity filters.
 
-    mvn package -P deploy-web -D deploy.path="../../openmrs-1.8.x/webapp/src/main/webapp"
+---
 
-It will allow you to deploy any changes to your web 
-resources such as jsp or js files without re-installing the module. The deploy path says 
-where OpenMRS is deployed.
+## Hibernate Filter Definition
 
-Installation
-------------
-1. Build the module to produce the .omod file.
-2. Use the OpenMRS Administration > Manage Modules screen to upload and install the .omod file.
+The module provides the following Hibernate filter:
 
-If uploads are not allowed from the web (changable via a runtime property), you can drop the omod
-into the ~/.OpenMRS/modules folder.  (Where ~/.OpenMRS is assumed to be the Application 
-Data Directory that the running openmrs is currently using.)  After putting the file in there 
-simply restart OpenMRS/tomcat and the module will be loaded and started.
+```json
+[
+  {
+    "name": "patient_location_based_filter",
+    "targetClasses": [
+      "org.openmrs.Patient"
+    ],
+    "condition":
+      "patient_id IN (
+        SELECT p.patient_id FROM patient p
+        INNER JOIN person_address pa ON p.patient_id = pa.person_id
+        WHERE pa.location_id IN (:locationIds)
+      )",
+    "parameters": [
+      {
+        "name": "locationIds",
+        "type": "integer"
+      }
+    ]
+  }
+]
+```
+## How it works
+
+- Targets the **Patient** entity.
+- Filters patients whose **address location** is in the `locationIds` parameter.
+- The parameter `locationIds` is dynamically populated by the `LocationBasedPatientDataFilterListener`.
+
+---
+
+## Location-Based Filter Listener
+
+The listener handles enabling the filter at runtime:
+
+- Skips filter for **super users**.
+- Fetches accessible locations for the authenticated user:
+    - From **user properties**
+    - From **user privileges** (if no property exists)
+- Automatically includes **child locations** for each accessible location.
+- Injects the **location IDs** into the Hibernate filter.
+
+---
+
+## Usage
+
+- Include the module in your OpenMRS modules directory.
+- The Hibernate filter is automatically applied to all **Patient** queries.
+- Extend the listener or filters if you need other **entity-based location restrictions**.
+
+---
+
+## Notes
+
+- **Super users** bypass all location filters.
+- **Child locations** are recursively included in the filter.
+- Users without a defined location property will have access determined by their **privileges**.
+- The filter is applied **transparently at the Hibernate level**.

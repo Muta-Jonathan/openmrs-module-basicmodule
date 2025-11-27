@@ -126,27 +126,7 @@ public class LocationBasedPatientDataFilterListener implements DataFilterListene
 		}
 		return accessibleLocationUuids;
 	}
-	
-	//	/**
-	//	 * Get all child location ids for the user's accessible locations
-	//	 *
-	//	 * @return set of location ids
-	//	 */
-	//	public static Location getPersonLocation(Person person) {
-	//		String locationAttributeUuid = Context.getAdministrationService().getGlobalProperty(
-	//		    LocationBasedAccessConstants.LOCATION_ATTRIBUTE_GLOBAL_PROPERTY_NAME);
-	//		if (StringUtils.isNotBlank(locationAttributeUuid)) {
-	//			final PersonAttributeType personAttributeType = Context.getPersonService().getPersonAttributeTypeByUuid(
-	//			    locationAttributeUuid);
-	//			PersonAttribute personAttribute = person.getAttribute(personAttributeType);
-	//			if (personAttribute != null) {
-	//				Location personLocation = Context.getLocationService().getLocationByUuid(personAttribute.getValue());
-	//				return personLocation;
-	//			}
-	//		}
-	//		return null;
-	//	}
-	
+
 	/**
 	 * Recursively finds all descendant (child) locations
 	 */
