@@ -11,8 +11,6 @@
 	<description>
 			${project.parent.description}
 	</description>
-
-	<activator>${MODULE_PACKAGE}.BasicModuleActivator</activator>
 	
 	<require_version>${openMRSVersion}</require_version>
 

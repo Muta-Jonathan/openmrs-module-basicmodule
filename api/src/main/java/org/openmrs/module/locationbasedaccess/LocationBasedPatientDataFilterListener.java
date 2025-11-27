@@ -126,7 +126,7 @@ public class LocationBasedPatientDataFilterListener implements DataFilterListene
 		}
 		return accessibleLocationUuids;
 	}
-
+	
 	/**
 	 * Recursively finds all descendant (child) locations
 	 */
