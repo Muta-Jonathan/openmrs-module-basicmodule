@@ -1,0 +1,20 @@
+[
+  {
+    "name": "patient_location_based_filter",
+    "targetClasses": [
+      "org.openmrs.Patient"
+    ],
+    "condition":
+      "patient_id IN (
+        SELECT p.patient_id FROM patient p
+        INNER JOIN person_address pa ON p.patient_id = pa.person_id
+        WHERE pa.location_id IN (:locationIds)
+      )",
+    "parameters": [
+      {
+        "name": "locationIds",
+        "type": "integer"
+      }
+    ]
+  }
+]
